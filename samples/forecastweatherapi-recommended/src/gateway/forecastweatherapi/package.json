@@ -1,0 +1,31 @@
+{
+    "name": "forecastweatherapi",
+    "version": "1.0.0",
+    "description": "forecastweatherapi API",
+    "repository": {
+      "type": "git",
+      "url": ""
+    },
+    "main": "index.js",
+    "scripts": {
+      "test": "cucumber-js test/features --tags @BRANCH_NAME --format ./node_modules/cucumber-pretty"
+    },
+    "dependencies": {
+      "apickli": "2.0.0",
+      "cucumber": "4.0.0",
+      "cucumber-pretty": "1.4.1",
+      "got": "8.3.0",
+      "lodash": "4.17.5",
+      "tunnel": "0.0.5"
+    },
+    "babel": {
+      "presets": [
+        "env"
+      ]
+    },
+    "ava": {
+      "require": [
+        "babel-register"
+      ]
+    }
+  }

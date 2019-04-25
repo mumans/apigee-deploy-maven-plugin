@@ -1,0 +1,77 @@
+#!groovy​
+pipeline {
+    agent { dockerfile true }
+
+    tools {
+        maven 'Maven 3.6.1'
+        jdk 'jdk8'
+    }
+
+    environment {
+        APIGEE_EVAL_COMMON_CREDS = credentials('f820b62b-cf5d-46fd-b07a-3c6800d17bad')
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '15'))
+        disableConcurrentBuilds()
+        timeout(time: 15, unit: 'MINUTES')
+    }
+
+    stages {
+
+        stage ('Initialize') {
+            steps {
+                sh '''
+                    echo "PATH = ${PATH}"
+                    echo "M2_HOME = ${M2_HOME}"
+                '''
+            }
+        }   
+
+        stage('Prepare environment') {
+            steps {
+                echo "Prepare environment message"
+                script {
+                    echo "${env.BRANCH_NAME}"
+                    if (env.BRANCH_NAME == 'dev') {
+                        ENV_NAME = "dev"
+                    } else if (env.BRANCH_NAME == 'prod') {
+                        ENV_NAME = "prod"
+                    } else if (env.BRANCH_NAME == 'master') {
+                        ENV_NAME = "test"
+                        //SKIP_ALL = "true"
+                    } else {
+                        currentBuild.result = 'ABORTED'
+                        error("${env.BRANCH_NAME} was not configured in Jenkinsfile")
+                    }
+                }
+            }
+        }
+
+        stage ('Build and deploy') {
+            steps {
+                sh 'pwd'
+                dir ('samples/forecastweatherapi-recommended/src/gateway/forecastweatherapi') {
+                    sh 'pwd'
+                    sh 'cat ./pom.xml'
+                    sh "mvn install -P=test -Dusername=${env.APIGEE_EVAL_COMMON_CREDS_USR} -Dpassword=${env.APIGEE_EVAL_COMMON_CREDS_PSW} -DpomFile=./pom.xml" 
+                }
+                sh 'pwd'
+                echo "Build and deploy message"
+            }
+            post {
+                success {
+                    //junit 'target/surefire-reports/**/*.xml' 
+                    echo "success message"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Publish test results
+            echo "post message"
+        }
+    }
+}
