@@ -38,11 +38,12 @@ pipeline {
                     echo "${env.BRANCH_NAME}"
                     if (env.BRANCH_NAME == 'dev') {
                         ENV_NAME = "dev"
-                    } else if (env.BRANCH_NAME == 'prod') {
-                        ENV_NAME = "prod"
                     } else if (env.BRANCH_NAME == 'master') {
-                        ENV_NAME = "test"
-                        //SKIP_ALL = "true"
+                        ENV_NAME = "prod"
+                    } else if (env.BRANCH_NAME == 'rec') {
+                        ENV_NAME = "rec" 
+                    } else if (env.BRANCH_NAME == 'hors-production') {
+                        ENV_NAME = "hors-production"
                     } else {
                         currentBuild.result = 'ABORTED'
                         error("${env.BRANCH_NAME} was not configured in Jenkinsfile")
@@ -58,7 +59,6 @@ pipeline {
                     sh 'cat ./pom.xml'
                     sh "mvn install -P=test -Dusername=${env.APIGEE_EVAL_COMMON_CREDS_USR} -Dpassword=${env.APIGEE_EVAL_COMMON_CREDS_PSW} -DpomFile=./pom.xml" 
                 }
-                echo "Build and deploy message"
             }
             post {
                 success {
