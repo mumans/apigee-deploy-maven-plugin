@@ -55,8 +55,6 @@ pipeline {
         stage ('Build and deploy') {
             steps {
                 dir ('samples/forecastweatherapi-recommended/src/gateway/forecastweatherapi') {
-                    sh 'pwd'
-                    sh 'cat ./pom.xml'
                     sh "mvn install -P=test -Dusername=${env.APIGEE_EVAL_COMMON_CREDS_USR} -Dpassword=${env.APIGEE_EVAL_COMMON_CREDS_PSW} -DpomFile=./pom.xml" 
                 }
             }

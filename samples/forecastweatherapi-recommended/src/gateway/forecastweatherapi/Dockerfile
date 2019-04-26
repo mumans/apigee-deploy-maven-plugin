@@ -37,6 +37,7 @@ RUN git clone https://github.com/kamatama41/tfenv.git ~/.tfenv && \
 RUN terraform -v && ansible --version && packer -v
 
 RUN sudo apt-get install maven -y
+RUN sudo apt-get install npm -y
 
 # cleanup
 RUN sudo apt-get -qy autoremove
