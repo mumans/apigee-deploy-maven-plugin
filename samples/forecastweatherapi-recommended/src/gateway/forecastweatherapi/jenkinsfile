@@ -2,10 +2,10 @@
 pipeline {
     agent { dockerfile true }
 
-    tools {
+    /*tools {
         maven 'Maven 3.6.1'
         jdk 'jdk8'
-    }
+    }*/
 
     environment {
         APIGEE_EVAL_COMMON_CREDS = credentials('f820b62b-cf5d-46fd-b07a-3c6800d17bad')
@@ -61,6 +61,7 @@ pipeline {
                         echo "PATH = ${PATH}"
                         echo "M2_HOME = ${M2_HOME}"
                     '''
+                    sh "mvn -v"
                     sh "mvn install -P=test -Dusername=${env.APIGEE_EVAL_COMMON_CREDS_USR} -Dpassword=${env.APIGEE_EVAL_COMMON_CREDS_PSW} -DpomFile=./pom.xml" 
                 }
             }
