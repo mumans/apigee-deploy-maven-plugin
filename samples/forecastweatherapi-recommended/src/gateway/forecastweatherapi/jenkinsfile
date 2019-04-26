@@ -12,9 +12,13 @@ pipeline {
     }
 
     options {
-        buildDiscarder(logRotator(numToKeepStr: '15'))
+        buildDiscarder(logRotator(numToKeepStr: '10'))
         disableConcurrentBuilds()
-        timeout(time: 15, unit: 'MINUTES')
+        timeout(time: 10, unit: 'MINUTES')
+    }
+
+    triggers {
+        pollSCM('H/24 * * * *')
     }
 
     stages {
