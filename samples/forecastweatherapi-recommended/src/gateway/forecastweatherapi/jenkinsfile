@@ -57,6 +57,7 @@ pipeline {
             }
             post {
                 success {
+                    echo "post message success"
                     //junit 'target/surefire-reports/**/*.xml' 
                 }
             }
