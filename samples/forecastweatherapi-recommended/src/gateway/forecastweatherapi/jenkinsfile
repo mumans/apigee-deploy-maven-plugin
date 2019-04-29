@@ -78,7 +78,7 @@ pipeline {
             }
             steps {
                 dir ('samples/forecastweatherapi-recommended/src/gateway/forecastweatherapi') {
-                    sh "mvn jmeter:jmeter -Ptest -Dusername=${env.APIGEE_EVAL_COMMON_CREDS_USR} -Dpassword=${env.APIGEE_EVAL_COMMON_CREDS_PSW} -Dorg=testmyapi -DtestData=weather_test.csv -DthreadNum=5 -DrampUpPeriodSecs=5 -DloopCount=2"
+                    sh "mvn jmeter:jmeter -Ptest -Dusername=${env.APIGEE_EVAL_COMMON_CREDS_USR} -Dpassword=${env.APIGEE_EVAL_COMMON_CREDS_PSW} -DtestData=weather_test.csv -DthreadNum=5 -DrampUpPeriodSecs=5 -DloopCount=2"
                 }
             }
         }
