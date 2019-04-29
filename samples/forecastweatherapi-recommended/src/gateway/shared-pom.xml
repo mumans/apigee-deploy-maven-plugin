@@ -112,6 +112,35 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>com.lazerycode.jmeter</groupId>
+                <artifactId>jmeter-maven-plugin</artifactId>
+                <version>1.8.1</version>
+                <executions>
+                    <execution>
+                        <id>jmeter-tests</id>
+                        <goals>
+                            <goal>jmeter</goal>
+                        </goals>
+                        <configuration>
+                            <skipTests>${skipTests}</skipTests>
+                            <ignoreResultFailures>true</ignoreResultFailures>
+                            <suppressJMeterOutput>false</suppressJMeterOutput>
+                            <propertiesUser>
+                                <testData>weather_test.csv</testData>
+                                <threadNum>5</threadNum>
+                                <rampUpPeriodSecs>5</rampUpPeriodSecs>
+                                <loopCount>2</loopCount>
+                            </propertiesUser>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <testFilesDirectory>tests</testFilesDirectory>
+                    <testResultsTimestamp>false</testResultsTimestamp>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <!-- This is where you add the environment specific properties under various profile names -->
