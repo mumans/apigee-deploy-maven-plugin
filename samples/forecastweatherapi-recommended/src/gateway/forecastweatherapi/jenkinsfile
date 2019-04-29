@@ -2,11 +2,6 @@
 pipeline {
     agent { dockerfile true }
 
-    /*tools {
-        maven 'Maven 3.6.1'
-        jdk 'jdk8'
-    }*/
-
     environment {
         APIGEE_EVAL_COMMON_CREDS = credentials('f820b62b-cf5d-46fd-b07a-3c6800d17bad')
     }
@@ -37,13 +32,13 @@ pipeline {
                 script {
                     echo "${env.BRANCH_NAME}"
                     if (env.BRANCH_NAME == 'dev') {
-                        ENV_NAME = "dev"
+                        MVN_PROFILE = "dev"
                     } else if (env.BRANCH_NAME == 'master') {
-                        ENV_NAME = "prod"
+                        MVN_PROFILE = "test" // TODO : remettre prod
                     } else if (env.BRANCH_NAME == 'rec') {
-                        ENV_NAME = "rec" 
+                        MVN_PROFILE = "rec" 
                     } else if (env.BRANCH_NAME == 'hors-production') {
-                        ENV_NAME = "hors-production"
+                        MVN_PROFILE = "hors-production"
                     } else {
                         currentBuild.result = 'ABORTED'
                         error("${env.BRANCH_NAME} was not configured in Jenkinsfile")
@@ -55,13 +50,33 @@ pipeline {
         stage ('Build and deploy') {
             steps {
                 dir ('samples/forecastweatherapi-recommended/src/gateway/forecastweatherapi') {
+                    sh 'printenv'
                     sh "mvn install -P=test -Dusername=${env.APIGEE_EVAL_COMMON_CREDS_USR} -Dpassword=${env.APIGEE_EVAL_COMMON_CREDS_PSW} -DpomFile=./pom.xml" 
+                    sh 'printenv'
                 }
             }
             post {
                 success {
                     //junit 'target/surefire-reports/**/*.xml' 
-                    echo "success message"
+                }
+            }
+        }
+
+        stage ('Tests:Integration') {
+            steps {
+                // Tests d'integration
+                dir ('samples/forecastweatherapi-recommended/src/gateway/forecastweatherapi') {
+                }
+            }
+        }
+
+        stage ('Tests:Peformence') {
+            when {
+                environment name: 'MVN_PROFILE', value: 'test'
+            }
+            steps {
+                dir ('samples/forecastweatherapi-recommended/src/gateway/forecastweatherapi') {
+                    sh "mvn jmeter:jmeter -Ptest -Dusername=${env.APIGEE_EVAL_COMMON_CREDS_USR} -Dpassword=${env.APIGEE_EVAL_COMMON_CREDS_PSW} -Dorg=testmyapi -DtestData=weather_test.csv -DthreadNum=5 -DrampUpPeriodSecs=5 -DloopCount=2"
                 }
             }
         }
@@ -69,8 +84,11 @@ pipeline {
 
     post {
         always {
-            // Publish test results
+            // Publish all tests results
             echo "post message"
         }
+        failure {  
+             //mail bcc: '', body: "<b>Apigee</b><br>Project: ${env.JOB_NAME} <br>Build Number: ${env.BUILD_NUMBER} <br> URL de build: ${env.BUILD_URL}", cc: '', charset: 'UTF-8', from: '', mimeType: 'text/html', replyTo: '', subject: "ERROR CI: Project name -> ${env.JOB_NAME}", to: "foo@foomail.com";  
+         }
     }
 }
