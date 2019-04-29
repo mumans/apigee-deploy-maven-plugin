@@ -32,13 +32,13 @@ pipeline {
                 script {
                     echo "${env.BRANCH_NAME}"
                     if (env.BRANCH_NAME == 'dev') {
-                        MVN_PROFILE = "dev"
+                        env.MVN_PROFILE = "dev"
                     } else if (env.BRANCH_NAME == 'master') {
-                        MVN_PROFILE = "test" // TODO : remettre prod
+                        env.MVN_PROFILE = "test" // TODO : remettre prod
                     } else if (env.BRANCH_NAME == 'rec') {
-                        MVN_PROFILE = "rec" 
+                        env.MVN_PROFILE = "rec" 
                     } else if (env.BRANCH_NAME == 'hors-production') {
-                        MVN_PROFILE = "hors-production"
+                        env.MVN_PROFILE = "hors-production"
                     } else {
                         currentBuild.result = 'ABORTED'
                         error("${env.BRANCH_NAME} was not configured in Jenkinsfile")
